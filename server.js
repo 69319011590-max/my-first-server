@@ -1,24 +1,38 @@
-// 1. เรียกใช้งาน Module ที่ชื่อว่า 'http'
-const http = require('http');
+// ============================================================================
+// Forest Theme Web Server
+// ผู้จัดทำ : นายฐิติกร ชัยสิงห์
+// รหัสนักศึกษา : 69319011590
+// วิชา : Web Server
+// ============================================================================
 
-// 2. กำหนด Port
+// เรียกใช้งานโมดูล HTTP ของ Node.js
+const http = require("http");
+
+// กำหนด Port
 const port = process.env.PORT || 3000;
 
-// 3. สร้าง Server
+// สร้าง Web Server
 const server = http.createServer((req, res) => {
 
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    // ส่งสถานะการทำงาน
+    res.writeHead(200, {
+        "Content-Type": "text/html; charset=utf-8"
+    });
 
+    // ส่ง HTML กลับไปยัง Browser
     res.end(`
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Forest Web Server</title>
 
 <style>
+
 *{
     margin:0;
     padding:0;
@@ -26,102 +40,384 @@ const server = http.createServer((req, res) => {
 }
 
 body{
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    background: linear-gradient(rgba(0,60,20,0.4), rgba(0,30,10,0.6)),
-    url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1600&q=80');
+
+    font-family:'Segoe UI',sans-serif;
+
+    background-image:
+    linear-gradient(rgba(0,40,10,.45),rgba(0,20,0,.70)),
+    url("https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920");
+
     background-size:cover;
     background-position:center;
-    height:100vh;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+
     display:flex;
     justify-content:center;
     align-items:center;
+
+    width:100%;
+    height:100vh;
+
     overflow:hidden;
+
 }
 
-.card{
-    width:700px;
-    background:rgba(255,255,255,0.12);
+/* ============================= */
+
+.container{
+
+    width:90%;
+    max-width:800px;
+
+    background:rgba(255,255,255,.15);
+
     backdrop-filter:blur(12px);
-    border-radius:25px;
-    padding:45px;
-    text-align:center;
-    color:white;
+    -webkit-backdrop-filter:blur(12px);
+
     border:2px solid rgba(255,255,255,.25);
-    box-shadow:0 15px 40px rgba(0,0,0,.45);
-    animation:fade 1.5s ease;
+
+    border-radius:30px;
+
+    padding:50px;
+
+    text-align:center;
+
+    color:white;
+
+    box-shadow:0 20px 40px rgba(0,0,0,.45);
+
+    animation:show 1.2s ease;
+
 }
 
-@keyframes fade{
-    from{
-        opacity:0;
-        transform:translateY(30px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
+/* ============================= */
+
+@keyframes show{
+
+0%{
+
+opacity:0;
+transform:translateY(50px);
+
+}
+
+100%{
+
+opacity:1;
+transform:translateY(0);
+
+}
+
+}
+
+/* ============================= */
+
+.logo{
+
+font-size:70px;
+
+margin-bottom:20px;
+
+animation:bounce 3s infinite;
+
+}
+
+@keyframes bounce{
+
+0%{transform:translateY(0);}
+50%{transform:translateY(-10px);}
+100%{transform:translateY(0);}
+
+}
+
+/* ============================= */
+
+h1{
+
+font-size:42px;
+
+margin-bottom:15px;
+
+text-shadow:3px 3px 10px black;
+
+}
+
+.subtitle{
+
+font-size:24px;
+
+color:#c8ffb0;
+
+margin-bottom:30px;
+
+}
+
+/* ============================= */
+
+.info{
+
+background:rgba(0,0,0,.25);
+
+padding:25px;
+
+border-radius:20px;
+
+margin-top:20px;
+
+line-height:2;
+
+font-size:22px;
+
+}
+
+/* ============================= */
+
+.badge{
+
+display:inline-block;
+
+margin-top:35px;
+
+padding:15px 35px;
+
+background:#2E7D32;
+
+border-radius:50px;
+
+font-size:22px;
+
+font-weight:bold;
+
+box-shadow:0 0 25px #66BB6A;
+
+animation:glow 2s infinite;
+
+}
+
+@keyframes glow{
+
+0%{
+
+box-shadow:0 0 10px #4CAF50;
+
+}
+
+50%{
+
+box-shadow:0 0 35px #81C784;
+
+}
+
+100%{
+
+box-shadow:0 0 10px #4CAF50;
+
+}
+
+}
+
+/* ============================= */
+
+.description{
+
+margin-top:30px;
+
+font-size:20px;
+
+line-height:2;
+
+}
+
+/* ============================= */
+
+.footer{
+
+margin-top:35px;
+
+font-size:16px;
+
+color:#dddddd;
+
+}
+
+/* ============================= */
+/* ใบไม้ตก */
+
+.leaf{
+
+position:absolute;
+
+font-size:35px;
+
+top:-80px;
+
+animation:fall linear infinite;
+
+}
+
+.leaf:nth-child(1){
+
+left:5%;
+
+animation-duration:9s;
+
+}
+
+.leaf:nth-child(2){
+
+left:20%;
+
+animation-duration:12s;
+
+}
+
+.leaf:nth-child(3){
+
+left:35%;
+
+animation-duration:10s;
+
+}
+
+.leaf:nth-child(4){
+
+left:50%;
+
+animation-duration:11s;
+
+}
+
+.leaf:nth-child(5){
+
+left:65%;
+
+animation-duration:8s;
+
+}
+
+.leaf:nth-child(6){
+
+left:80%;
+
+animation-duration:13s;
+
+}
+
+.leaf:nth-child(7){
+
+left:93%;
+
+animation-duration:9s;
+
+}
+
+@keyframes fall{
+
+0%{
+
+transform:translateY(-120px) rotate(0deg);
+
+opacity:0;
+
+}
+
+20%{
+
+opacity:1;
+
+}
+
+100%{
+
+transform:translateY(120vh) rotate(360deg);
+
+opacity:0;
+
+}
+
+}
+
+/* ============================= */
+
+button{
+
+margin-top:30px;
+
+padding:15px 35px;
+
+font-size:18px;
+
+border:none;
+
+border-radius:30px;
+
+background:#4CAF50;
+
+color:white;
+
+cursor:pointer;
+
+transition:.3s;
+
+}
+
+button:hover{
+
+background:#66BB6A;
+
+transform:scale(1.08);
+
+}
+
+/* ============================= */
+
+@media(max-width:768px){
+
+.logo{
+
+font-size:55px;
+
 }
 
 h1{
-    font-size:40px;
-    margin-bottom:20px;
-    text-shadow:2px 2px 8px black;
+
+font-size:30px;
+
 }
 
-h2{
-    color:#d4ffb2;
-    margin-bottom:20px;
-}
+.subtitle{
 
-p{
-    font-size:20px;
-    line-height:1.8;
+font-size:20px;
+
 }
 
 .info{
-    margin-top:30px;
-    background:rgba(0,0,0,.25);
-    padding:20px;
-    border-radius:15px;
+
+font-size:18px;
+
 }
 
-.badge{
-    display:inline-block;
-    margin-top:25px;
-    background:#2e7d32;
-    padding:12px 25px;
-    border-radius:30px;
-    font-weight:bold;
-    font-size:18px;
-    box-shadow:0 0 20px #4caf50;
+.description{
+
+font-size:17px;
+
 }
 
-.footer{
-    margin-top:30px;
-    font-size:15px;
-    color:#eeeeee;
+.container{
+
+padding:30px;
+
 }
 
-.leaf{
-    position:absolute;
-    font-size:30px;
-    animation:float 8s infinite linear;
+button{
+
+width:100%;
+
 }
 
-.leaf:nth-child(1){left:5%;animation-duration:9s;}
-.leaf:nth-child(2){left:25%;animation-duration:12s;}
-.leaf:nth-child(3){left:50%;animation-duration:8s;}
-.leaf:nth-child(4){left:75%;animation-duration:10s;}
-.leaf:nth-child(5){left:90%;animation-duration:11s;}
-
-@keyframes float{
-    from{
-        transform:translateY(-120px) rotate(0deg);
-    }
-    to{
-        transform:translateY(110vh) rotate(360deg);
-    }
 }
+
 </style>
 
 </head>
@@ -133,40 +429,94 @@ p{
 <div class="leaf">🍀</div>
 <div class="leaf">🌱</div>
 <div class="leaf">🍃</div>
+<div class="leaf">🌿</div>
+<div class="leaf">🍀</div>
 
-<div class="card">
+<div class="container">
 
-<h1>🌲 Forest Web Server 🌲</h1>
+<div class="logo">
+🌲
+</div>
 
-<h2>ยินดีต้อนรับ</h2>
+<h1>Forest Web Server</h1>
 
-<p>
-สวัสดีครับ!<br>
-นี่คือ Web Server ของ
-</p>
+<div class="subtitle">
+ยินดีต้อนรับสู่ Web Server
+</div>
 
 <div class="info">
-<h2>นายฐิติกร ชัยสิงห์</h2>
-<p>รหัสนักศึกษา : 69319011590</p>
+
+<h2>👨‍💻 นายฐิติกร ชัยสิงห์</h2>
+
+<p>
+รหัสนักศึกษา : <b>69319011590</b>
+</p>
+
+<p>
+Web Server ทำงานสำเร็จบน Railway
+</p>
+
+<p>
+Node.js HTTP Server
+</p>
+
 </div>
 
 <div class="badge">
-✅ Railway Server Online
+🟢 SERVER ONLINE
 </div>
+
+<div class="description">
+
+ยินดีต้อนรับเข้าสู่เว็บไซต์ตัวอย่างที่สร้างขึ้นด้วยภาษา JavaScript
+บน Node.js โดยใช้ HTTP Module
+
+เว็บไซต์นี้ออกแบบในธีมป่าไม้ (Forest Theme)
+เพื่อสื่อถึงธรรมชาติ ความสดชื่น และความเรียบง่าย
+พร้อมเอฟเฟกต์ Glassmorphism และ Animation
+ที่ช่วยเพิ่มความสวยงามและความทันสมัย
+
+</div>
+
+<button onclick="showMessage()">
+🌳 คลิกเพื่อทักทาย
+</button>
 
 <div class="footer">
-สร้างด้วย Node.js HTTP Server<br>
-ธีมธรรมชาติและป่าไม้ 🍃
+
+© 2026 Forest Theme Web Server<br>
+
+สร้างโดย นายฐิติกร ชัยสิงห์
+
 </div>
 
 </div>
+
+<script>
+
+function showMessage(){
+
+alert("🌿 ยินดีต้อนรับเข้าสู่ Forest Web Server 🍃\\n\\nขอให้มีความสุขกับการเรียน Web Server");
+
+}
+
+</script>
 
 </body>
+
 </html>
 `);
 });
 
-// 4. เปิด Server
+// เริ่มทำงานของ Server
 server.listen(port, () => {
-    console.log(\`Server is running! เครื่องแม่ข่ายเปิดทำงานแล้วที่ช่องทาง: \${port}\`);
+
+    console.log("======================================");
+    console.log(" Forest Theme Web Server Started");
+    console.log(" Server Running Successfully");
+    console.log(" Port : " + port);
+    console.log(" Student : นายฐิติกร ชัยสิงห์");
+    console.log(" Student ID : 69319011590");
+    console.log("======================================");
+
 });
