@@ -1,30 +1,67 @@
 const http = require('http');
-// 1. เรียกใชงาน Pool จากไลบรารี pg สําหรับจัดการการเชื่อมตอฐานขอมูล
+// 1. เรียกใช้งาน Pool จากไลบรารี pg สำหรับจัดการการเชื่อมต่อฐานข้อมูล
 const { Pool } = require('pg');
-// 2. ตั้งคาการเชื่อมตอ โดยดึง URL มาจาก Environment Variable ของ Railway
+// 2. ตั้งค่าการเชื่อมต่อ โดยดึง URL มาจาก Environment Variable ของ Railway
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 const port = process.env.PORT || 3000;
+
+// ฟังก์ชันสร้างแถวตาราง แยกออกมาต่างหาก เพื่อไม่ต้องซ้อน template literal หลายชั้น
+function buildTableRows(rows) {
+  return rows
+    .map(
+      (row, index) => `
+        <tr style="animation-delay: ${index * 0.05}s;">
+          <td>${row.student_id}</td>
+          <td>${row.student_name}</td>
+        </tr>`
+    )
+    .join('');
+}
+
+function buildTableOrEmpty(rows) {
+  if (rows.length === 0) {
+    return `
+      <div class="empty-state">
+        <div class="empty-state-icon">🌊</div>
+        <h3>ยังไม่มีข้อมูลนักศึกษา</h3>
+        <p>กรุณาเพิ่มข้อมูลในฐานข้อมูล</p>
+      </div>`;
+  }
+
+  return `
+    <table>
+      <thead>
+        <tr>
+          <th>🆔 รหัสนักศึกษา</th>
+          <th>👤 ชื่อ-นามสกุล</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${buildTableRows(rows)}
+      </tbody>
+    </table>`;
+}
 
 const server = http.createServer(async (req, res) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
   try {
-    // 3. ขอเชื่อมตอและสงคําสั่ง SQL ไปดึงขอมูลจากตาราง students
+    // 3. ขอเชื่อมต่อและส่งคำสั่ง SQL ไปดึงข้อมูลจากตาราง students
     const client = await pool.connect();
     const result = await client.query('SELECT * FROM students');
-    client.release(); // คนืการเชื่อมตอเมื่อใชงานเสร็จ
+    client.release(); // คืนการเชื่อมต่อเมื่อใช้งานเสร็จ
 
-    // 4. นําขอมูลที่ได(result.rows) มาประกอบเปนตาราง HTML พร้อมธีมทะเล
-    let html = `
+    // 4. นำข้อมูลที่ได้ (result.rows) มาประกอบเป็นตาราง HTML พร้อมธีมทะเล
+    const html = `
     <!DOCTYPE html>
     <html lang="th">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>🌊 ระบบฐานขอมูลนักศึกษา</title>
+      <title>🌊 ระบบฐานข้อมูลนักศึกษา</title>
       <style>
         * {
           margin: 0;
@@ -48,7 +85,7 @@ const server = http.createServer(async (req, res) => {
           left: 0;
           width: 100%;
           height: 100%;
-          background-image: 
+          background-image:
             url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120'%3E%3Cpath d='M0,50 Q300,0 600,50 T1200,50 L1200,120 L0,120 Z' fill='rgba(255,255,255,0.1)'/%3E%3C/svg%3E");
           background-repeat: repeat-x;
           background-position: 0 0;
@@ -208,34 +245,18 @@ const server = http.createServer(async (req, res) => {
         }
 
         @keyframes fadeInDown {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
 
         .bubble {
@@ -250,22 +271,14 @@ const server = http.createServer(async (req, res) => {
         }
 
         @keyframes float-up {
-          0% {
-            bottom: -50px;
-            opacity: 0;
-          }
-          50% {
-            opacity: 0.5;
-          }
-          100% {
-            bottom: 100vh;
-            opacity: 0;
-          }
+          0% { bottom: -50px; opacity: 0; }
+          50% { opacity: 0.5; }
+          100% { bottom: 100vh; opacity: 0; }
         }
       </style>
     </head>
     <body>
-      <!-- ฟองขึ้นคลื่น -->
+      <!-- ฟองอากาศลอยขึ้น -->
       <div class="bubble" style="width: 40px; height: 40px; left: 10%; animation-delay: 0s;"></div>
       <div class="bubble" style="width: 60px; height: 60px; left: 30%; animation-delay: 2s;"></div>
       <div class="bubble" style="width: 30px; height: 30px; left: 50%; animation-delay: 4s;"></div>
@@ -274,7 +287,7 @@ const server = http.createServer(async (req, res) => {
 
       <div class="container">
         <div class="header">
-          <h1>🌊 ระบบฐานขอมูลนักศึกษา</h1>
+          <h1>🌊 ระบบฐานข้อมูลนักศึกษา</h1>
           <p>ทดสอบการเชื่อมต่อและการดึงข้อมูลจากฐานข้อมูล</p>
         </div>
 
@@ -292,30 +305,7 @@ const server = http.createServer(async (req, res) => {
         <div class="card">
           <div class="card-header">ข้อมูลนักศึกษา</div>
           <div class="card-content">
-            ${result.rows.length > 0 ? \`
-              <table>
-                <thead>
-                  <tr>
-                    <th>🆔 รหัสนักศึกษา</th>
-                    <th>👤 ชื่อ-นามสกุล</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  \${result.rows.map((row, index) => \`
-                    <tr style="animation-delay: \${index * 0.05}s;">
-                      <td>\${row.student_id}</td>
-                      <td>\${row.student_name}</td>
-                    </tr>
-                  \`).join('')}
-                </tbody>
-              </table>
-            \` : \`
-              <div class="empty-state">
-                <div class="empty-state-icon">🌊</div>
-                <h3>ยังไม่มีข้อมูลนักศึกษา</h3>
-                <p>กรุณาเพิ่มข้อมูลในฐานข้อมูล</p>
-              </div>
-            \`}
+            ${buildTableOrEmpty(result.rows)}
           </div>
         </div>
 
@@ -325,14 +315,14 @@ const server = http.createServer(async (req, res) => {
       </div>
     </body>
     </html>
-    \`;
-    
+    `;
+
     res.end(html);
   } catch (err) {
-    // กรณีเชื่อมตอไมไดหรือเขียนชื่อตารางผิด
+    // กรณีเชื่อมต่อไม่ได้หรือเขียนชื่อตารางผิด
     console.error(err);
-    
-    const errorHtml = \`
+
+    const errorHtml = `
     <!DOCTYPE html>
     <html lang="th">
     <head>
@@ -340,11 +330,7 @@ const server = http.createServer(async (req, res) => {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>⚠️ เกิดข้อผิดพลาด</title>
       <style>
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
           background: linear-gradient(135deg, #1a0a0a 0%, #4a1a1a 50%, #7a3a3a 100%);
@@ -363,15 +349,8 @@ const server = http.createServer(async (req, res) => {
           text-align: center;
           animation: slideIn 0.5s ease-out;
         }
-        .error-icon {
-          font-size: 4em;
-          margin-bottom: 20px;
-        }
-        h1 {
-          color: #d32f2f;
-          margin-bottom: 10px;
-          font-size: 2em;
-        }
+        .error-icon { font-size: 4em; margin-bottom: 20px; }
+        h1 { color: #d32f2f; margin-bottom: 10px; font-size: 2em; }
         .error-message {
           background: #fff3cd;
           border-left: 4px solid #ff9800;
@@ -383,20 +362,10 @@ const server = http.createServer(async (req, res) => {
           color: #333;
           overflow-x: auto;
         }
-        .debug-info {
-          margin-top: 20px;
-          font-size: 0.9em;
-          color: #666;
-        }
+        .debug-info { margin-top: 20px; font-size: 0.9em; color: #666; }
         @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       </style>
     </head>
@@ -407,7 +376,7 @@ const server = http.createServer(async (req, res) => {
         <p>ไม่สามารถเชื่อมต่อกับฐานข้อมูลได้</p>
         <div class="error-message">
           <strong>ข้อความข้อผิดพลาด:</strong><br>
-          \${err.message}
+          ${err.message}
         </div>
         <div class="debug-info">
           <p>🔍 โปรดตรวจสอบ:</p>
@@ -420,13 +389,13 @@ const server = http.createServer(async (req, res) => {
       </div>
     </body>
     </html>
-    \`;
-    
+    `;
+
     res.end(errorHtml);
   }
 });
 
 server.listen(port, () => {
-  console.log(\`🌊 Server is running on port: \${port}\`);
-  console.log(\`📍 Open browser: http://localhost:\${port}\`);
+  console.log(`🌊 Server is running on port: ${port}`);
+  console.log(`📍 Open browser: http://localhost:${port}`);
 });
